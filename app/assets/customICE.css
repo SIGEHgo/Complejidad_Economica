@@ -1,0 +1,26 @@
+.nav-link {
+    color: rgb(0, 0, 0) !important;
+    background-color: transparent !important;
+}
+
+.nav-link.active {
+    background-color: rgb(87, 27, 0) !important;
+    color: white !important;
+}
+path.leaflet-interactive:focus {
+    
+  }
+.hidden_custom {
+    display: none;
+}
+.ms-auto.navbar-nav{
+    position: relative;
+    z-index: 4;
+}
+.nav-item{
+    z-index: 5;
+    background-color: rgba(13, 110, 253, 0.37);
+}
+.leaflet-container.leaflet-touch.leaflet-retina.leaflet-safari.leaflet-fade-anim.leaflet-grab.leaflet-touch-drag.leaflet-touch-zoom{
+    z-index: 3;
+}
