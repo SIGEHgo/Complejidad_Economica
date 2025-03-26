@@ -388,4 +388,4 @@ def navigate(n_clicks):
     return dash.no_update
 
 if __name__ == "__main__":
-    app.run_server()
+    app.run(host="0.0.0.0", port=10000)
