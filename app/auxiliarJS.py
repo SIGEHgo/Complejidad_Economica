@@ -1,4 +1,4 @@
-from dash import html, dcc
+from dash import html
 import dash_leaflet.express as dlx
 from dash_extensions.javascript import assign
 import auxiliarBar
@@ -10,10 +10,8 @@ ctg = ["{}+".format(cls, classes[i + 1]) for i, cls in enumerate(classes[:-1])] 
 colorbar = dlx.categorical_colorbar(categories=ctg, colorscale=colorscale, width=300, height=30, position="bottomleft")
 #Funciones propias 
 
-info = html.Div(children=[html.Button('Go to not Home', id='navigate-button',style={"display":'none',"position":"relative","marginTop":"0","marginBottom":"0","marginLeft":"auto","marginRight":"auto"}),
-                          html.Div(children=auxiliarBar.createBarplot_industrias(df_industrial="F",año_sel="T",feature=None), id="info", className="info",
-                 style = {"position": "absolute", "top": "10px", "right": "10px", "zIndex": "1000", 'width': '250px', 'height': '40px'}),
-                dcc.Location(id='url', refresh=True)],style={"position": "absolute", "top": "5px", "right": "10px", "zIndex": "1000", 'width': '350px', 'height': 'auto',"textAlign":'end'})
+info = html.Div(children=auxiliarBar.createBarplot_industrias(df_industrial="F",año_sel="T",feature=None), id="info", className="info",
+                style={"position": "absolute", "top": "10px", "right": "10px", "zIndex": "10", 'width': '350px', 'height': '300px'})
 
 # Estilo dinámico en JavaScript
 search_control = assign("""

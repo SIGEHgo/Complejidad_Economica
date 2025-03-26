@@ -4,8 +4,8 @@ from dash import html, dcc, Input, Output, State, no_update
 import dash_leaflet as dl
 import json
 from flask import Flask
-#Locales
 
+#Locales
 import auxiliarLeafltet
 import auxiliarLine
 import auxiliarNetwork
@@ -45,18 +45,10 @@ df_estatal['NOM_MUN'] = gdf_shapefile['NOM_MUN']
 map_default=auxiliarLeafltet.generateMapFromElection(lista_de_opciones_personal[-1],df_estatal,gdf_shapefile)
 df_industrial=pd.read_csv("Datos/CSVs/Balassa_Modificado_Historico/Balassa_Mod_Nivel_Municipio_por_Grupos_2024B.csv")
 print(df_industrial)
-radio_items_original=[
-                {'label': 'Promedio de personal', 'value': 'personal', },
-                {'label': 'Unidades económicas', 'value': 'unidades',}]
-radio_items_personal=[
-                {'label': 'Promedio de personal', 'value': 'personal'},]
-
-
-with open('Datos/Explicaciones breves.txt', encoding='utf-8') as f:
-    explicaciones_breves = json.load(f)
-
 server = Flask(__name__)
-app = dash.Dash(server=server, external_stylesheets=[dbc.themes.BOOTSTRAP, '/assets/customICE.css'],use_pages=True)
+
+app = dash.Dash(server=server, external_stylesheets=[dbc.themes.BOOTSTRAP, 'app/assets/customICE.css'])
+app.title = 'ICE'
 ####Lista de ids
 #unidad_medida
 #opcion_denue_semestre
@@ -66,9 +58,190 @@ app = dash.Dash(server=server, external_stylesheets=[dbc.themes.BOOTSTRAP, '/ass
 #store-map
 #store-hist
 #hideout_geojson
+radio_items_original=[
+                {'label': 'Promedio de personal', 'value': 'personal', },
+                {'label': 'Unidades económicas', 'value': 'unidades',}]
+radio_items_personal=[
+                {'label': 'Promedio de personal', 'value': 'personal'},]
 
 
-app.layout = dash.page_container
+with open('Datos/Explicaciones breves.txt', encoding='utf-8') as f:
+    explicaciones_breves = json.load(f)
+accordion =  dbc.Accordion(
+    [
+        dbc.AccordionItem(###############     ICE
+        [
+            html.P(explicaciones_breves.get('Complejidad Económica','')),html.Button("Ver más...", style={'marginTop': 'auto'})
+        ],
+        title="Índice de Complejidad Económica de Entidades Goegráficas",
+        style={'display':'block'},
+        id='accordion-ice',item_id="1"
+        ),
+        dbc.AccordionItem(
+        [
+            html.P(explicaciones_breves.get('Afinidad contra Complejidad de Producto','')),
+            html.Button("Ver más...", style={'marginTop': 'auto'})
+        ],
+        title="Afinidad vs. Complejidad de Productos",
+        style={'display':'none'},
+        id='accordion-afinidad',item_id="2"
+        ),
+        dbc.AccordionItem(
+        [html.P(explicaciones_breves.get('Diversidad vs Ubicuidad',''))],
+        title="Diversidad vs. Ubiquidad",
+        style={'display':'none'},
+        id='accordion-diversidad',item_id="3"
+        ),
+        dbc.AccordionItem(
+        [ 
+            
+            dbc.Modal(
+            [
+                dbc.ModalHeader(dbc.ModalTitle("Header")),
+            ],
+            id="modal-xl-espacio-prod",
+            size="xl",
+            is_open=False,
+            ),
+            html.P(explicaciones_breves.get('Conexión de Municipios',''))
+            ,dbc.Button("Ver Espacio de Productos", id="open-xl", n_clicks=0, disabled=True, color="danger"),
+            
+        ],
+        title="Espacio de Entidades",
+        style={'display':'none'},
+        id='accordion-espacio-prod',item_id="4"
+        ),
+    ],active_item=["1","2","3","4"]
+    )
+sidebar = html.Div(
+    [
+        html.H2("Visualizador geográfico"),
+        html.Hr(),
+        html.P("Índice de Complejidad Económica", className="lead"),
+        html.Hr(),
+        html.P("Unidad de medida:", className="lead", style={'fontSize': 'smaller'}),
+        dcc.RadioItems(
+            options=radio_items_original, value='personal', id='unidad_medida'),
+        html.Hr(),
+        html.P("Selecciona una edición del Directorio Estadístico Nacional de Unidades Económicas", className="lead", style={'fontSize': 'smaller'}),
+        dcc.Dropdown(options=lista_de_opciones_personal, value=lista_de_opciones_personal[-1], id='opcion_denue_semestre'),
+        html.Div(accordion, style={"margin-top": "auto"})  # Esto empuja el acordeón hacia abajo
+    ],
+    style={
+        "height": "100vh",
+        "display": "flex",
+        "flex-direction": "column",
+        "padding-left": "1vw",
+        "padding-top": "2vw",
+        "background-color": "#f8f9fa",
+    },
+)
+
+##Dependiendo de la unidad de medida, se cambia el dropdown
+
+navbar = dbc.NavbarSimple(
+    children=[
+        dbc.NavItem(dbc.NavLink("ICE", href="#", id="nav1-link", className="nav-link active",n_clicks=0)),
+        dbc.NavItem(dbc.NavLink("Afinidad", href="#", id="nav2-link", className="nav-link",n_clicks=0)),
+        dbc.NavItem(dbc.NavLink("Diversidad/Ubicuidad", href="#", id="nav3-link", className="nav-link",n_clicks=0)),
+        dbc.NavItem(dbc.NavLink("Espacio de Entidades", href="#", id="nav4-link", className="nav-link",n_clicks=0)),
+    ],
+    brand="",
+    brand_href="#",
+    color="primary",
+    dark=True,
+    style={'height':'5.5vh'},
+    
+)
+geojson_fijo=dl.GeoJSON(
+        data=map_default,
+        style=style_handle,
+        onEachFeature=on_each_feature,
+        hideout=dict(selected=[47], classes=classes, colorscale=colorscale, style=style, colorProp="Area"),
+        id="geojson",
+        options=dict(interactive=False),
+    )
+content = html.Div(
+    id="page-content",
+    children=[dl.Map(id="map-container",
+        center=[gdf_shapefile.geometry.centroid.y.mean(), gdf_shapefile.geometry.centroid.x.mean()],
+        zoom=8,
+        children=[dl.TileLayer(), 
+                  geojson_fijo,info
+                  ],
+        style={'width': '100%', 'height': '50vh', 'margin': "auto", "display": "block", 'opacity': 1,'z-index':'3'},
+        className=''
+    )],
+    style={'width': '100%', 'height': '50vh'}
+)
+interior_alt_content=dcc.Graph(id='interior-alt-content',figure={},style={'height':'91.5vh', 'background-color':'lightgray'},
+                                 config={'scrollZoom': True})
+alt_content = html.Div(
+    id="alt-content",
+    children=interior_alt_content,
+    style={'display':'none'}
+)
+interior_alt_content2=dcc.Graph(id='interior-alt-content2',figure={},style={'height':'71.5vh', 'background-color':'lightgray'},
+                                 config={'scrollZoom': True})
+alt_content_2 = html.Div(
+    id="alt-content2",
+    children=[interior_alt_content2,dcc.Graph(figure=auxiliarScatter.tabla(),style={'height':'20vh', 'background-color':'lightgray'})],
+    style={'display':'none'}
+)
+interior_alt_content3=dcc.Graph(id='interior-alt-content3',figure={},style={'height':'91.5vh',  'background-color':'lightgray'},
+                                 config={'scrollZoom': True})
+alt_content_3 = html.Div(
+    id="alt-content3",
+    children=interior_alt_content3,
+    style={'display':'none'}
+)
+
+app.layout = dbc.Container(
+    [
+        dbc.Row([
+            dbc.Col(sidebar, width=3, style={"height": "100vh"},xs=12,sm=12,md=3,lg=3,xl=3,xxl=3),
+            dbc.Col(
+                [dcc.Store(id='df-industrial',data={
+                                                        "data-frame": df_industrial.to_dict("records"),
+                                                        "año_sel":"2024B"
+                                                    }),
+                    navbar,
+                    dcc.Store(id='store-eleccion',modified_timestamp=-1),
+                    dcc.Store(id="resize-trigger", data=False),##Este hará un window resize para solucionar el bug de leaflet
+                    content,
+                    
+                    alt_content,
+                    alt_content_2,
+                    alt_content_3,
+                    dcc.Store(id="store-map", data=map_default),
+                    dcc.Store(id="hideout_geojson", data=dict(selected=[], classes=classes, colorscale=colorscale, style=style, colorProp="Area")),
+                    dcc.Store(id='store-afinidad',data=[lista_de_opciones_unidades[-1],],modified_timestamp=-1),
+                    dcc.Store(id='store-diversidad',data=[lista_de_opciones_unidades[-1],],modified_timestamp=-1),
+                    dcc.Store(id='store-espacio-prod',data=[lista_de_opciones_unidades[-1],], modified_timestamp=-1),
+                    dbc.Row(id='contenedor-historico',children=
+                        [
+                            dbc.Col(id="2-1", width=12,
+                                    children=[dcc.Graph(figure=auxiliarLine.generateTimeSeries(df_estatal, [47],'personal'),style={'height':'41.5vh'},
+                                                        config={"scrollZoom": True,})],
+                                    style={'height':'41.5vh'},)
+                        ],
+                        className="g-0",
+                        style={'height':'41.5vh'},
+                    ),
+                ],
+                width=9,
+                style={
+                    "padding-top": "1.5vh",
+                    "padding-bottom": "1.5vh",
+                    "padding-left": "2vw",
+                    "padding-right": "2vw",
+                       }  # Agrega espacio a la derecha y padding interno
+            ,xs=12,sm=12,md=9,lg=9,xl=9,xxl=9),
+        ], className="g-0"),
+    ],
+    fluid=True,
+    style={'height':'100vh','padding':'0'}
+)
 
                 ####################  Puras Callbacks  ####################
 #####################         Dropdown
@@ -296,7 +469,7 @@ def toggle_select(_, feature, hideout):
 )
 def timeSeriesGivenFeature(hideout,unidad_medida):
     selected = hideout["selected"]
-    return dcc.Graph(figure=auxiliarLine.generateTimeSeries(df_estatal, selected,unidad_medida),style={'height':'41.5vh'},config={'displaylogo': False})  # You can format properties as needed
+    return dcc.Graph(figure=auxiliarLine.generateTimeSeries(df_estatal, selected,unidad_medida),style={'height':'41.5vh'})  # You can format properties as needed
 
 
 
@@ -305,7 +478,7 @@ def timeSeriesGivenFeature(hideout,unidad_medida):
 #Recibe algún click sobre el mapa o su contenedor, Revisa los estados de los clicks sobre algún feature
 #Actualiza la gráfica de top5 y los estilos necesarios. Reinicia los clicks si no se selecciona un feature
 @app.callback(
-    [Output("info", "children"), Output("info", "style"),Output("geojson",'n_clicks'),Output("map-container",'n_clicks'),Output("navigate-button", "style")],
+    [Output("info", "children"), Output("info", "style"),Output("geojson",'n_clicks'),Output("map-container",'n_clicks')],
     [Input("map-container",'n_clicks'),
     State('geojson','n_clicks'),State("geojson",'clickData'),State("info", "style"),State("df-industrial",'data')],
     prevent_initial_call=True)
@@ -314,17 +487,14 @@ def update_info_and_style(n_click_container,click_map,feature, style,df_industri
     print(pd.DataFrame(df_industrial["data-frame"]))
     print("numero de clicks en container: "+str(n_click_container))
     print("numero de clicks en geojson: "+str(click_map))
-    if(n_click_container== click_map):##Fue un click dentro
+    if(n_click_container== click_map):##Fue un click afuera
         children = auxiliarBar.createBarplot_industrias( pd.DataFrame(df_industrial["data-frame"]),df_industrial['año_sel'],feature)
-        if feature is None:
-            style = {"position": "relative", "top": "10px", "right": "10px", "zIndex": "1000", 'width': '350px', 'height': '4px'}
-        else:
-            style = {"position": "relative", "top": "10px", "right": "10px", "zIndex": "1000", 'width': '350px', 'height': '400px'}
-        return children, style,click_map,n_click_container,    {"display":'none',"position":"relative","marginTop":"0","marginBottom":"0","marginLeft":"auto","marginRight":"auto"}
-    else:#fuera
+        style = {"position": "absolute", "top": "10px", "right": "10px", "zIndex": "1000", 'width': '350px', 'height': '400px'}
+        return children, style,click_map,n_click_container
+    else:
         children = []
         style = {"display": "none"}
-    return children, style,0,0, {"display":'none'}
+    return children, style,0,0
 
 
 
@@ -344,12 +514,7 @@ def generarBigNetwork(stored_data):
             espacio_slow=auxiliarNetwork.espacio_producto(formatted_year,formatted_year)
     else:#2015
         espacio_slow=auxiliarNetwork.espacio_producto("2015","2015")
-    return [html.P(explicaciones_breves.get('Espacio Producto A','')),html.Hr(),explicaciones_breves.get('Espacio Producto B',''),dcc.Graph(figure=espacio_slow,config={'scrollZoom': True,
-                                         'modeBarButtonsToRemove': ["zoom","pan","resetScale","select","lasso2d","zoomIn","zoomOut"],
-                                         'modeBarButtonsToAdd': [
-                                        'drawopenpath',
-                                        'eraseshape'
-                                       ]})],'success',False
+    return [html.P(explicaciones_breves.get('Espacio Producto','')),dcc.Graph(figure=espacio_slow)],'success',False
 
 
 @app.callback(
@@ -361,31 +526,6 @@ def toggle_modal(n1, is_open):
     if n1:
         return not is_open
     return is_open
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-@app.callback(
-    dash.dependencies.Output('url', 'href'),
-    [dash.dependencies.Input('navigate-button', 'n_clicks')]
-)
-def navigate(n_clicks):
-    if n_clicks:
-        return '/not_home'
-    return dash.no_update
 
 if __name__ == "__main__":
     app.run_server()

@@ -4,7 +4,7 @@ import plotly.graph_objects as go
 
 def createBarplot_industrias(df_industrial,año_sel,feature=None):
     if not feature:
-        return html.P("Selecciona un municipio")
+        return [html.P("Selecciona un municipio")]
     nombre = feature["properties"]["CVE_MUN"]
     #df_industrial = pd.read_csv('Datos/CSVs//estatal_industrias_ballasaM.csv')
     row = df_industrial[df_industrial['cve_mun'] == int(nombre)].iloc[:, 2:]
@@ -40,6 +40,6 @@ def createBarplot_industrias(df_industrial,año_sel,feature=None):
             'yaxis': {'anchor': 'free', 'side': 'right'},
         }
     )
-    return dcc.Graph(figure=fig.update_layout(
+    return [dcc.Graph(figure=fig.update_layout(
     margin=dict(l=20, r=20, t=30, b=20),
-), style={'height': '300px','width':'350px'},config={'modeBarButtonsToRemove': ["zoom","pan","select","lasso2d","zoomIn","zoomOut","autoScale","resetScale"],'displaylogo': False})
+), style={'height': '300px','width':'350px'})]

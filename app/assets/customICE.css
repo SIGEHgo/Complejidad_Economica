@@ -8,7 +8,7 @@
     color: white !important;
 }
 path.leaflet-interactive:focus {
-    
+    outline: none;
   }
 .hidden_custom {
     display: none;
