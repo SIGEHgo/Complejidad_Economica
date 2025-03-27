@@ -71,7 +71,7 @@ accordion =  dbc.Accordion(
     [
         dbc.AccordionItem(###############     ICE
         [
-            html.P(explicaciones_breves.get('Complejidad Económica','')),html.Button("Ver más...", style={'marginTop': 'auto'})
+            html.P(explicaciones_breves.get('Complejidad Económica',''))
         ],
         title="Índice de Complejidad Económica de Entidades Goegráficas",
         style={'display':'block'},
@@ -79,8 +79,8 @@ accordion =  dbc.Accordion(
         ),
         dbc.AccordionItem(
         [
-            html.P(explicaciones_breves.get('Afinidad contra Complejidad de Producto','')),
-            html.Button("Ver más...", style={'marginTop': 'auto'})
+            html.P(explicaciones_breves.get('Afinidad contra Complejidad de Producto',''))
+           
         ],
         title="Afinidad vs. Complejidad de Productos",
         style={'display':'none'},
@@ -175,21 +175,36 @@ content = html.Div(
     style={'width': '100%', 'height': '50vh'}
 )
 interior_alt_content=dcc.Graph(id='interior-alt-content',figure={},style={'height':'91.5vh', 'background-color':'lightgray'},
-                                 config={'scrollZoom': True})
+                                 config={'scrollZoom': True,
+                                         'modeBarButtonsToRemove': ["zoom","pan","resetScale","select","lasso2d","zoomIn","zoomOut"],
+                                         'modeBarButtonsToAdd': [
+                                        'drawopenpath',
+                                        'eraseshape'
+                                       ]})
 alt_content = html.Div(
     id="alt-content",
     children=interior_alt_content,
     style={'display':'none'}
 )
 interior_alt_content2=dcc.Graph(id='interior-alt-content2',figure={},style={'height':'71.5vh', 'background-color':'lightgray'},
-                                 config={'scrollZoom': True})
+                                 config={'scrollZoom': True,
+                                         'modeBarButtonsToRemove': ["zoom","pan","resetScale","select","lasso2d","zoomIn","zoomOut"],
+                                         'modeBarButtonsToAdd': [
+                                        'drawopenpath',
+                                        'eraseshape'
+                                       ]})
 alt_content_2 = html.Div(
     id="alt-content2",
     children=[interior_alt_content2,dcc.Graph(figure=auxiliarScatter.tabla(),style={'height':'20vh', 'background-color':'lightgray'})],
     style={'display':'none'}
 )
 interior_alt_content3=dcc.Graph(id='interior-alt-content3',figure={},style={'height':'91.5vh',  'background-color':'lightgray'},
-                                 config={'scrollZoom': True})
+                                 config={'scrollZoom': True,
+                                         'modeBarButtonsToRemove': ["zoom","pan","resetScale","select","lasso2d","zoomIn","zoomOut"],
+                                         'modeBarButtonsToAdd': [
+                                        'drawopenpath',
+                                        'eraseshape'
+                                       ]})
 alt_content_3 = html.Div(
     id="alt-content3",
     children=interior_alt_content3,
@@ -222,7 +237,7 @@ app.layout = dbc.Container(
                         [
                             dbc.Col(id="2-1", width=12,
                                     children=[dcc.Graph(figure=auxiliarLine.generateTimeSeries(df_estatal, [47],'personal'),style={'height':'41.5vh'},
-                                                        config={"scrollZoom": True,})],
+                                                        config={'displaylogo': False})],
                                     style={'height':'41.5vh'},)
                         ],
                         className="g-0",
@@ -469,7 +484,7 @@ def toggle_select(_, feature, hideout):
 )
 def timeSeriesGivenFeature(hideout,unidad_medida):
     selected = hideout["selected"]
-    return dcc.Graph(figure=auxiliarLine.generateTimeSeries(df_estatal, selected,unidad_medida),style={'height':'41.5vh'})  # You can format properties as needed
+    return dcc.Graph(figure=auxiliarLine.generateTimeSeries(df_estatal, selected,unidad_medida),style={'height':'41.5vh'},config={'displaylogo': False})  # You can format properties as needed
 
 
 
@@ -514,7 +529,12 @@ def generarBigNetwork(stored_data):
             espacio_slow=auxiliarNetwork.espacio_producto(formatted_year,formatted_year)
     else:#2015
         espacio_slow=auxiliarNetwork.espacio_producto("2015","2015")
-    return [html.P(explicaciones_breves.get('Espacio Producto','')),dcc.Graph(figure=espacio_slow)],'success',False
+    return [html.P(explicaciones_breves.get('Espacio Producto','')),dcc.Graph(figure=espacio_slow,config={'scrollZoom': True,
+                                         'modeBarButtonsToRemove': ["zoom","pan","resetScale","select","lasso2d","zoomIn","zoomOut"],
+                                         'modeBarButtonsToAdd': [
+                                        'drawopenpath',
+                                        'eraseshape'
+                                       ]})],'success',False
 
 
 @app.callback(
