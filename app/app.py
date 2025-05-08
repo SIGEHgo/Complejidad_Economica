@@ -177,14 +177,13 @@ content = html.Div(
             html.Img(
                 src="./assets/Planeacion_SEDECO_Transparente.png",  
                 style={
-                    "width": "10wh",   # Tamaño del ícono
-                    "height": "10vh",  # Tamaño del ícono
+                    "height": "4vh",  # Tamaño del ícono
                 }
             )
         ],
         style={ # Estilos CSS aplicados al Div
             "position": "absolute", # El elemento no ocupa espacio en el diseño habitual. Esto significa que otros elementos actúan como si el elemento "absoluto" no existiera.
-            "bottom": "2vh",   # Posicionamiento desde el borde inferior
+            "bottom": "42vh",   # Posicionamiento desde el borde inferior
             "left": "5wh",     # Posicionamiento desde el borde izquierdo
             "z-index": "1000"   # Asegura que esté sobre otros elementos
         }
