@@ -172,23 +172,22 @@ content = html.Div(
         style={'width': '100%', 'height': '50vh', 'margin': "auto", "display": "block", 'opacity': 1,'z-index':'3'},
         className=''
     ),
-    # html.Div(
-    #     children=[
-    #         html.Img(
-    #             src="./assets/logo lab.png",  
-    #             style={
-    #                 "width": "10wh",   # Tamaño del ícono
-    #                 "height": "10vh",  # Tamaño del ícono
-    #             }
-    #         )
-    #     ],
-    #     style={ # Estilos CSS aplicados al Div
-    #         "position": "absolute", # El elemento no ocupa espacio en el diseño habitual. Esto significa que otros elementos actúan como si el elemento "absoluto" no existiera.
-    #         "bottom": "2vh",   # Posicionamiento desde el borde inferior
-    #         "left": "5wh",     # Posicionamiento desde el borde izquierdo
-    #         "z-index": "1000"   # Asegura que esté sobre otros elementos
-    #     }
-    # )
+    html.Div(
+        children=[
+            html.Img(
+                src="./assets/Planeacion_SEDECO_Transparente.png",  
+                style={
+                    "height": "4vh",  # Tamaño del ícono
+                }
+            )
+        ],
+        style={ # Estilos CSS aplicados al Div
+            "position": "absolute", # El elemento no ocupa espacio en el diseño habitual. Esto significa que otros elementos actúan como si el elemento "absoluto" no existiera.
+            "bottom": "44vh",   # Posicionamiento desde el borde inferior
+            "left": "5wh",     # Posicionamiento desde el borde izquierdo
+            "z-index": "1000"   # Asegura que esté sobre otros elementos
+        }
+    )
     ],
     style={'width': '100%', 'height': '50vh'}
 )
