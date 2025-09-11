@@ -4,13 +4,13 @@ import re
 import plotly.express as px
 ##Corregir los nombres de los renglones seleccionados. 
 ##Debe actualizarse si se hace el cambio de unidad de medida. 
-def generateTimeSeries(df_estatal, n_array, unidad):
+def generateTimeSeries(df_estatal, n_array, unidad, corte, maximo):
     if unidad == 'personal':
-        columnas = slice(1, 19)
+        columnas = slice(1, corte)
         fig = px.line(title="ICE histórico. Promedio de personal", labels={"x": "Año", "y": "ICE a nivel estatal"})
 
     else:
-        columnas = slice(19, 37)
+        columnas = slice(corte, maximo)
         fig = px.line(title="ICE histórico. Número de Unidades Económicas", labels={"x": "Año", "y": "ICE a nivel estatal"})
     for n in n_array:
         row = df_estatal.iloc[n, columnas]

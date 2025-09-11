@@ -253,7 +253,7 @@ app.layout = dbc.Container(
                     dbc.Row(id='contenedor-historico',children=
                         [
                             dbc.Col(id="2-1", width=12,
-                                    children=[dcc.Graph(figure=auxiliarLine.generateTimeSeries(df_estatal, [47],'personal'),style={'height':'41.5vh'},
+                                    children=[dcc.Graph(figure=auxiliarLine.generateTimeSeries(df_estatal, [47],'personal', corte=len(lista_de_opciones_unidades) + 1, maximo = 2*len(lista_de_opciones_unidades) + 1),style={'height':'41.5vh'},
                                                         config={'displaylogo': False})],
                                     style={'height':'41.5vh'},)
                         ],
@@ -501,7 +501,7 @@ def toggle_select(_, feature, hideout):
 )
 def timeSeriesGivenFeature(hideout,unidad_medida):
     selected = hideout["selected"]
-    return dcc.Graph(figure=auxiliarLine.generateTimeSeries(df_estatal, selected,unidad_medida),style={'height':'41.5vh'},config={'displaylogo': False})  # You can format properties as needed
+    return dcc.Graph(figure=auxiliarLine.generateTimeSeries(df_estatal, selected,unidad_medida, corte=len(lista_de_opciones_unidades) + 1, maximo = 2*len(lista_de_opciones_unidades) + 1),style={'height':'41.5vh'},config={'displaylogo': False})  # You can format properties as needed
 
 
 
@@ -565,4 +565,4 @@ def toggle_modal(n1, is_open):
     return is_open
 
 if __name__ == "__main__":
-    app.run_server()
+    app.run()
