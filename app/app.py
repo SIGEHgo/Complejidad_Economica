@@ -235,7 +235,7 @@ app.layout = dbc.Container(
             dbc.Col(
                 [dcc.Store(id='df-industrial',data={
                                                         "data-frame": df_industrial.to_dict("records"),
-                                                        "año_sel":"2024B"
+                                                        "año_sel":"2025A"
                                                     }),
                     navbar,
                     dcc.Store(id='store-eleccion',modified_timestamp=-1),
