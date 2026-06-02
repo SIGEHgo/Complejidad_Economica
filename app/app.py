@@ -73,7 +73,7 @@ accordion =  dbc.Accordion(
         [
             html.P(explicaciones_breves.get('Complejidad Económica',''))
         ],
-        title="Índice de Complejidad Económica de Entidades Goegráficas",
+        title="Índice de Complejidad Económica de Entidades Geográficas",
         style={'display':'block'},
         id='accordion-ice',item_id="1"
         ),
